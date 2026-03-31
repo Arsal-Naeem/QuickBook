@@ -29,7 +29,9 @@ export const UPSERT_TOKEN_QUERY = `
     Refresh_Token,
     X_Refresh_Token_Expires_In
   )
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  VALUES (
+    ?, ?, ?, ?, AES_ENCRYPT(?, ?), ?, ?, ?, AES_ENCRYPT(?, ?), AES_ENCRYPT(?, ?), ?
+  )
   ON DUPLICATE KEY UPDATE
     Tenant_ID = VALUES(Tenant_ID),
     State = VALUES(State),
@@ -65,17 +67,22 @@ export function toTokenRecord(token, Realm_ID, Tenant_ID) {
 }
 
 export function tokenRecordToQueryParams(tokenRecord) {
+  const encryptionKey = process.env.QBO_TOKEN_ENCRYPTION_KEY;
+
   return [
     tokenRecord.Tenant_ID,
     tokenRecord.Realm_ID,
     tokenRecord.State,
     tokenRecord.Latency,
     tokenRecord.ID_Token,
+    encryptionKey,
     tokenRecord.Created_At,
     tokenRecord.Expires_In,
     tokenRecord.Token_Type,
     tokenRecord.Access_Token,
+    encryptionKey,
     tokenRecord.Refresh_Token,
+    encryptionKey,
     tokenRecord.X_Refresh_Token_Expires_In,
   ];
 }
@@ -116,9 +123,26 @@ export async function getValidQboClient(con, Tenant_ID) {
     redirectUri: process.env.QBO_REDIRECT_URI,
   });
 
+  const encryptionKey = process.env.QBO_TOKEN_ENCRYPTION_KEY;
+
   const [tokenRows] = await con.query(
-    `SELECT ${TOKEN_COLUMNS} FROM qbo_tokens WHERE Tenant_ID = ? ORDER BY Updated_At DESC LIMIT 1`,
-    [Tenant_ID],
+    `SELECT
+      Tenant_ID,
+      Realm_ID,
+      State,
+      Latency,
+      AES_DECRYPT(ID_Token, ?) AS ID_Token,
+      Created_At,
+      Expires_In,
+      Token_Type,
+      AES_DECRYPT(Access_Token, ?) AS Access_Token,
+      AES_DECRYPT(Refresh_Token, ?) AS Refresh_Token,
+      X_Refresh_Token_Expires_In
+    FROM qbo_tokens
+    WHERE Tenant_ID = ?
+    ORDER BY Updated_At DESC
+    LIMIT 1`,
+    [encryptionKey, encryptionKey, encryptionKey, Tenant_ID],
   );
 
   if (!tokenRows.length) {

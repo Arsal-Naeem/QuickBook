@@ -12,6 +12,7 @@ const requiredEnvVars = [
   "QBO_CLIENT_SECRET",
   "QBO_ENVIRONMENT",
   "QBO_REDIRECT_URI",
+  "QBO_TOKEN_ENCRYPTION_KEY",
 ];
 const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
 
