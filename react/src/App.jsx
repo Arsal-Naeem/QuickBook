@@ -40,6 +40,11 @@ export default function App() {
       const response = await fetch("/api/getCompanyInfo");
       const data = await response.json();
 
+      if (response.status === 401 && data.requiresAuth) {
+        window.location.href = "http://localhost:8000/authUri";
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(
           data.error ||

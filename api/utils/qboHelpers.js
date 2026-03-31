@@ -88,16 +88,19 @@ export function tokenRecordToQueryParams(tokenRecord) {
 }
 
 export function rowToOAuthToken(row) {
+  const decode = (val) =>
+    val == null ? undefined : Buffer.isBuffer(val) ? val.toString("utf8") : val;
+
   return {
     state: row.State ?? undefined,
     latency: parseNumber(row.Latency) ?? undefined,
     realmId: row.Realm_ID,
-    id_token: row.ID_Token ?? undefined,
+    id_token: decode(row.ID_Token),
     createdAt: parseNumber(row.Created_At) ?? undefined,
     expires_in: parseNumber(row.Expires_In) ?? undefined,
     token_type: row.Token_Type ?? undefined,
-    access_token: row.Access_Token,
-    refresh_token: row.Refresh_Token,
+    access_token: decode(row.Access_Token),
+    refresh_token: decode(row.Refresh_Token),
     x_refresh_token_expires_in:
       parseNumber(row.X_Refresh_Token_Expires_In) ?? undefined,
   };
@@ -170,4 +173,18 @@ export async function getValidQboClient(con, Tenant_ID) {
   oauthClient.setToken(activeToken);
 
   return { oauthClient, Realm_ID };
+}
+
+export function handleQboRouteError(error, res) {
+  if (
+    error.message === "No stored token found. Authenticate first via /authUri."
+  ) {
+    return res.status(401).json({ requiresAuth: true });
+  }
+
+  console.error("QBO route error:", error);
+  return res.status(500).json({
+    error: "Unable to complete QuickBooks request.",
+    details: error.originalMessage || error.message || "Unknown error",
+  });
 }

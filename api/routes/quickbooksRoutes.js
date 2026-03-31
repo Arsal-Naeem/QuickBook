@@ -2,7 +2,7 @@ import express from "express";
 import OAuthClient from "intuit-oauth";
 import dotenv from "dotenv";
 import pool from "../database/pool.js";
-import { getValidQboClient, upsertToken } from "../utils/qboHelpers.js";
+import { getValidQboClient, handleQboRouteError, upsertToken } from "../utils/qboHelpers.js";
 import mockAuthMW from "../middlewares/mockAuthMW.js";
 
 dotenv.config();
@@ -110,18 +110,7 @@ router.get("/getCompanyInfo", mockAuthMW, async (req, res) => {
 
     return res.json(companyInfoData);
   } catch (error) {
-    if (
-      error.message ===
-      "No stored token found. Authenticate first via /authUri."
-    ) {
-      return res.status(400).json({ error: error.message });
-    }
-
-    console.error("Failed to fetch company info:", error);
-    return res.status(500).json({
-      error: "Unable to fetch company info from QuickBooks.",
-      details: error.originalMessage || error.message || "Unknown error",
-    });
+    return handleQboRouteError(error, res);
   } finally {
     if (con) con.release();
   }
