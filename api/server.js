@@ -12,5 +12,5 @@ app.use('/', quickBooksRouter);
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
   console.log(`Go to http://localhost:${port}/authUri to start the login flow`);
-  console.log(`After authentication, call http://localhost:${port}/getCompanyInfo`);
+  console.log(`After authentication, call http://localhost:${port}/getCompanyInfo/<Realm_ID>`);
 });
