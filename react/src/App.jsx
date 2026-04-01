@@ -29,7 +29,7 @@ export default function App() {
   const [companyPayload, setCompanyPayload] = useState(null);
 
   const connectToQuickBooks = () => {
-    window.location.href = "http://localhost:8000/authUri";
+    window.location.href = "http://localhost:8000/qbo/authUri";
   };
 
   const getCompanyInfo = async () => {
@@ -37,11 +37,11 @@ export default function App() {
     setErrorMessage("");
 
     try {
-      const response = await fetch("/api/getCompanyInfo");
+      const response = await fetch("/api/qbo/getCompanyInfo");
       const data = await response.json();
 
       if (response.status === 401 && data.requiresAuth) {
-        window.location.href = "http://localhost:8000/authUri";
+        window.location.href = "http://localhost:8000/qbo/authUri";
         return;
       }
 
