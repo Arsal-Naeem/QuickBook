@@ -4,6 +4,7 @@ import quickBooksRouter from "./routes/quickbooksRoutes.js";
 import itemRouter from "./routes/itemRoutes.js";
 import customerRouter from "./routes/customerRoutes.js";
 import vendorRouter from "./routes/vendorRoutes.js";
+import defaultsRouter from "./routes/defaultsRoutes.js";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use("/qbo", quickBooksRouter);
 app.use("/qbo/items", itemRouter);
 app.use("/qbo/customers", customerRouter);
 app.use("/qbo/vendors", vendorRouter);
+app.use("/qbo/defaults", defaultsRouter);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

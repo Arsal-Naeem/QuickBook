@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function formatAddress(companyAddress) {
   if (!companyAddress) {
@@ -23,7 +24,7 @@ function formatAddress(companyAddress) {
     .join(", ");
 }
 
-export default function App() {
+export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [companyPayload, setCompanyPayload] = useState(null);
@@ -71,7 +72,21 @@ export default function App() {
   const Realm_ID = companyInfo?.Id || "Unavailable";
 
   return (
-    <main className="bg-atmosphere flex min-h-screen items-center justify-center px-4 py-10 text-slate-100">
+    <main className="bg-atmosphere flex flex-col min-h-screen items-center justify-center px-4 py-10 text-slate-100">
+      <div className="w-full max-w-xl mb-4 justify-end flex flex-wrap gap-3">
+        <Link
+          to="/test"
+          className="bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-600 transition"
+        >
+          Open API Test Dashboard
+        </Link>
+        <Link
+          to="/qb-defaults"
+          className="bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-600 transition"
+        >
+          Open QB Defaults
+        </Link>
+      </div>
       <section className="w-full max-w-xl animate-lift-in rounded-3xl border border-white/15 bg-card/80 p-7 shadow-glow backdrop-blur md:p-9">
         <div className="mb-8">
           <p className="mb-2 inline-flex rounded-full border border-accent/40 bg-accent/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-accent">

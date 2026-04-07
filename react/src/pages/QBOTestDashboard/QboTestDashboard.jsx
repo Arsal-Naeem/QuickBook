@@ -32,7 +32,10 @@ export default function QboTestDashboard() {
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold">QuickBooks API Tests</h1>
-            <Link to="/" className="text-accent underline">Back to Home</Link>
+            <div className="flex items-center gap-4">
+              <Link to="/qb-defaults" className="text-accent underline">QB Defaults</Link>
+              <Link to="/" className="text-accent underline">Back to Home</Link>
+            </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

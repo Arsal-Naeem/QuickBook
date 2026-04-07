@@ -19,3 +19,12 @@ CREATE TABLE
         PRIMARY KEY (Tenant_ID, Realm_ID),
         INDEX Realm_IDX (Realm_ID)
     );
+
+CREATE TABLE
+    IF NOT EXISTS qb_defaults (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        Name VARCHAR(250) NOT NULL,
+        QB_ID VARCHAR(100),
+        QB_Name VARCHAR(500),
+        UNIQUE KEY unique_setting_name (Name)
+    );
