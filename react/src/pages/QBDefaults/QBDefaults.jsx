@@ -2,46 +2,72 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { LuCheck, LuPencil } from "react-icons/lu";
 import { Link } from "react-router-dom";
 
-const QBO_SEARCH_SETTINGS = [
+const QBO_Fields = [
   {
+    type: "search",
     key: "walk_in_customer",
     label: "Walk-In Customer",
     searchEndpoint: "/api/qbo/defaults/searchCustomers",
   },
   {
+    type: "search",
     key: "payable_account",
     label: "Payable Account",
     searchEndpoint: "/api/qbo/defaults/searchAccounts",
   },
   {
+    type: "search",
     key: "receivable_account",
     label: "Receivable Account",
     searchEndpoint: "/api/qbo/defaults/searchAccounts",
   },
   {
+    type: "search",
     key: "tax_code",
     label: "Tax Code",
     searchEndpoint: "/api/qbo/defaults/searchTaxCodes",
   },
   {
+    type: "search",
     key: "card_control_account",
     label: "Card Control Account",
     searchEndpoint: "/api/qbo/defaults/searchAccounts",
   },
   {
+    type: "search",
     key: "cash_account",
     label: "Cash Account",
     searchEndpoint: "/api/qbo/defaults/searchAccounts",
   },
   {
+    type: "search",
     key: "cash_payment_method",
     label: "Cash Payment Method",
     searchEndpoint: "/api/qbo/defaults/searchPaymentMethods",
   },
   {
+    type: "search",
     key: "card_payment_method",
     label: "Card Payment Method",
     searchEndpoint: "/api/qbo/defaults/searchPaymentMethods",
+  },
+  {
+    type: "button",
+    key: "sync_customers",
+    label: "Customers",
+    action: "syncCustomers",
+    syncStatusKey: "customers_synced",
+    actionLabel: "Sync Customers",
+    loadingLabel: "Syncing...",
+  },
+  {
+    type: "button",
+    key: "sync_vendors",
+    label: "Vendors",
+    action: "syncVendors",
+    syncStatusKey: "vendors_synced",
+    actionLabel: "Sync Vendors",
+    loadingLabel: "Syncing...",
   },
 ];
 
@@ -93,7 +119,9 @@ export default function QBDefaults() {
 
   const activeSetting = useMemo(
     () =>
-      QBO_SEARCH_SETTINGS.find((setting) => setting.key === editingKey) ?? null,
+      QBO_Fields.find(
+        (field) => field.type === "search" && field.key === editingKey,
+      ) ?? null,
     [editingKey],
   );
 
@@ -285,8 +313,16 @@ export default function QBDefaults() {
     }
   };
 
-  const isCustomersSynced = savedDefaults["customers_synced"]?.QB_ID === "1";
-  const isVendorsSynced = savedDefaults["vendors_synced"]?.QB_ID === "1";
+  const buttonActionState = {
+    syncCustomers: {
+      onClick: handleSyncCustomers,
+      isLoading: isSyncingCustomers,
+    },
+    syncVendors: {
+      onClick: handleSyncVendors,
+      isLoading: isSyncingVendors,
+    },
+  };
 
   return (
     <main className="bg-atmosphere min-h-screen p-8 text-slate-100">
@@ -328,144 +364,146 @@ export default function QBDefaults() {
               Loading saved defaults...
             </div>
           ) : (
-            QBO_SEARCH_SETTINGS.map((setting) => {
-              const isEditing = editingKey === setting.key;
-              const existingValue = savedDefaults[setting.key];
+            QBO_Fields.filter((field) => field.type === "search").map(
+              (setting) => {
+                const isEditing = editingKey === setting.key;
+                const existingValue = savedDefaults[setting.key];
 
-              return (
-                <div
-                  key={setting.key}
-                  className="bg-card/80 rounded-3xl border border-white/15 p-6"
-                >
-                  <div className="grid gap-4 md:grid-cols-[220px,1fr,120px] md:items-start">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-200">
-                        {setting.label}
-                      </p>
-                    </div>
+                return (
+                  <div
+                    key={setting.key}
+                    className="bg-card/80 rounded-3xl border border-white/15 p-6"
+                  >
+                    <div className="grid gap-4 md:grid-cols-[220px,1fr,120px] md:items-start">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-200">
+                          {setting.label}
+                        </p>
+                      </div>
 
-                    <div className="space-y-3">
-                      {!isEditing ? (
-                        existingValue ? (
-                          <>
-                            <p className="text-sm text-white">
-                              {existingValue.QB_Name}
-                            </p>
-                            <p className="text-xs text-slate-400">
-                              ID: {existingValue.QB_ID}
-                            </p>
-                          </>
+                      <div className="space-y-3">
+                        {!isEditing ? (
+                          existingValue ? (
+                            <>
+                              <p className="text-sm text-white">
+                                {existingValue.QB_Name}
+                              </p>
+                              <p className="text-xs text-slate-400">
+                                ID: {existingValue.QB_ID}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-sm text-slate-300">Unassigned</p>
+                          )
                         ) : (
-                          <p className="text-sm text-slate-300">Unassigned</p>
-                        )
-                      ) : (
-                        <>
-                          <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(event) => {
-                              setSearchTerm(event.target.value);
-                              setSelectedResult(null);
-                            }}
-                            placeholder={`Search ${setting.label.toLowerCase()}...`}
-                            className="bg-slate-800 border border-slate-600 rounded-xl px-3 py-2 text-sm text-white w-full focus:outline-none focus:ring-2 focus:ring-accent"
-                          />
+                          <>
+                            <input
+                              type="text"
+                              value={searchTerm}
+                              onChange={(event) => {
+                                setSearchTerm(event.target.value);
+                                setSelectedResult(null);
+                              }}
+                              placeholder={`Search ${setting.label.toLowerCase()}...`}
+                              className="bg-slate-800 border border-slate-600 rounded-xl px-3 py-2 text-sm text-white w-full focus:outline-none focus:ring-2 focus:ring-accent"
+                            />
 
-                          <div className="max-h-56 overflow-auto rounded-xl border border-slate-600 bg-slate-900/70">
-                            {searchTerm.trim().length < 2 ? (
-                              <p className="px-3 py-2 text-sm text-slate-400">
-                                Type at least 2 characters to search.
-                              </p>
-                            ) : isSearching ? (
-                              <p className="px-3 py-2 text-sm text-slate-400">
-                                Searching...
-                              </p>
-                            ) : searchResults.length === 0 ? (
-                              <p className="px-3 py-2 text-sm text-slate-400">
-                                No results found.
-                              </p>
-                            ) : (
-                              searchResults.map((result, index) => {
-                                const resultLabel = getResultLabel(result);
-                                const resultMeta = getResultMeta(result);
-                                const isSelected =
-                                  selectedResult?.id === result.id &&
-                                  getResultLabel(selectedResult) ===
-                                    resultLabel;
+                            <div className="max-h-56 overflow-auto rounded-xl border border-slate-600 bg-slate-900/70">
+                              {searchTerm.trim().length < 2 ? (
+                                <p className="px-3 py-2 text-sm text-slate-400">
+                                  Type at least 2 characters to search.
+                                </p>
+                              ) : isSearching ? (
+                                <p className="px-3 py-2 text-sm text-slate-400">
+                                  Searching...
+                                </p>
+                              ) : searchResults.length === 0 ? (
+                                <p className="px-3 py-2 text-sm text-slate-400">
+                                  No results found.
+                                </p>
+                              ) : (
+                                searchResults.map((result, index) => {
+                                  const resultLabel = getResultLabel(result);
+                                  const resultMeta = getResultMeta(result);
+                                  const isSelected =
+                                    selectedResult?.id === result.id &&
+                                    getResultLabel(selectedResult) ===
+                                      resultLabel;
 
-                                return (
-                                  <button
-                                    key={`${result.id ?? "no-id"}-${resultLabel}-${index}`}
-                                    type="button"
-                                    onClick={() => setSelectedResult(result)}
-                                    className={`w-full border-b border-slate-700/60 px-3 py-2 text-left transition last:border-b-0 ${
-                                      isSelected
-                                        ? "bg-accent/20 text-accent"
-                                        : "hover:bg-slate-700/50"
-                                    }`}
-                                  >
-                                    <p className="text-sm font-medium">
-                                      {resultLabel}
-                                    </p>
-                                    {resultMeta ? (
-                                      <p className="text-xs text-slate-400">
-                                        {resultMeta}
+                                  return (
+                                    <button
+                                      key={`${result.id ?? "no-id"}-${resultLabel}-${index}`}
+                                      type="button"
+                                      onClick={() => setSelectedResult(result)}
+                                      className={`w-full border-b border-slate-700/60 px-3 py-2 text-left transition last:border-b-0 ${
+                                        isSelected
+                                          ? "bg-accent/20 text-accent"
+                                          : "hover:bg-slate-700/50"
+                                      }`}
+                                    >
+                                      <p className="text-sm font-medium">
+                                        {resultLabel}
                                       </p>
-                                    ) : null}
-                                    {result.id ? (
-                                      <p className="text-xs text-slate-400">
-                                        ID: {result.id}
-                                      </p>
-                                    ) : null}
-                                  </button>
-                                );
-                              })
-                            )}
-                          </div>
-
-                          {selectedResult ? (
-                            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-accent/40 bg-accent/10 px-3 py-2">
-                              <p className="text-sm text-accent">
-                                Selected: {getResultLabel(selectedResult)}
-                              </p>
-                              <button
-                                type="button"
-                                onClick={handleSaveDefault}
-                                disabled={isSaving}
-                                className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition disabled:cursor-not-allowed disabled:opacity-60"
-                              >
-                                {isSaving ? "Saving..." : "Save"}
-                              </button>
+                                      {resultMeta ? (
+                                        <p className="text-xs text-slate-400">
+                                          {resultMeta}
+                                        </p>
+                                      ) : null}
+                                      {result.id ? (
+                                        <p className="text-xs text-slate-400">
+                                          ID: {result.id}
+                                        </p>
+                                      ) : null}
+                                    </button>
+                                  );
+                                })
+                              )}
                             </div>
-                          ) : null}
-                        </>
-                      )}
-                    </div>
 
-                    <div className="flex md:justify-end">
-                      {!isEditing ? (
-                        <button
-                          type="button"
-                          onClick={() => startEditing(setting.key)}
-                          className="bg-slate-700 flex gap-2 justify-center items-center text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-600 transition"
-                        >
-                          <LuPencil />
-                          Edit
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={resetEditState}
-                          className="bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-600 transition"
-                        >
-                          Cancel
-                        </button>
-                      )}
+                            {selectedResult ? (
+                              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-accent/40 bg-accent/10 px-3 py-2">
+                                <p className="text-sm text-accent">
+                                  Selected: {getResultLabel(selectedResult)}
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={handleSaveDefault}
+                                  disabled={isSaving}
+                                  className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                  {isSaving ? "Saving..." : "Save"}
+                                </button>
+                              </div>
+                            ) : null}
+                          </>
+                        )}
+                      </div>
+
+                      <div className="flex md:justify-end">
+                        {!isEditing ? (
+                          <button
+                            type="button"
+                            onClick={() => startEditing(setting.key)}
+                            className="bg-slate-700 flex gap-2 justify-center items-center text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-600 transition"
+                          >
+                            <LuPencil />
+                            Edit
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={resetEditState}
+                            className="bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-600 transition"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
+                );
+              },
+            )
           )}
         </section>
         <section className="space-y-4">
@@ -483,51 +521,45 @@ export default function QBDefaults() {
           ) : null}
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-card/80 px-4 py-3">
-              <div>
-                <p className="text-sm font-semibold text-slate-200">
-                  Customers
-                </p>
-                {isCustomersSynced ? (
-                  <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-emerald-400">
-                    <LuCheck className="h-3 w-3" />
-                    Synced
-                  </p>
-                ) : (
-                  <p className="text-xs text-slate-400 mt-0.5">Not synced</p>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={handleSyncCustomers}
-                disabled={isSyncingCustomers}
-                className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSyncingCustomers ? "Syncing..." : "Sync Customers"}
-              </button>
-            </div>
+            {QBO_Fields.filter((field) => field.type === "button").map(
+              (field) => {
+                const actionState = buttonActionState[field.action];
+                const isSynced =
+                  savedDefaults[field.syncStatusKey]?.QB_ID === "1";
+                const isLoading = actionState?.isLoading ?? false;
 
-            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-card/80 px-4 py-3">
-              <div>
-                <p className="text-sm font-semibold text-slate-200">Vendors</p>
-                {isVendorsSynced ? (
-                  <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-emerald-400">
-                    <LuCheck className="h-3 w-3" />
-                    Synced
-                  </p>
-                ) : (
-                  <p className="text-xs text-slate-400 mt-0.5">Not synced</p>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={handleSyncVendors}
-                disabled={isSyncingVendors}
-                className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSyncingVendors ? "Syncing..." : "Sync Vendors"}
-              </button>
-            </div>
+                return (
+                  <div
+                    key={field.key}
+                    className="flex items-center justify-between rounded-2xl border border-white/10 bg-card/80 px-4 py-3"
+                  >
+                    <div>
+                      <p className="text-sm font-semibold text-slate-200">
+                        {field.label}
+                      </p>
+                      {isSynced ? (
+                        <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-emerald-400">
+                          <LuCheck className="h-3 w-3" />
+                          Synced
+                        </p>
+                      ) : (
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          Not synced
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={actionState?.onClick}
+                      disabled={!actionState?.onClick || isLoading}
+                      className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isLoading ? field.loadingLabel : field.actionLabel}
+                    </button>
+                  </div>
+                );
+              },
+            )}
           </div>
         </section>
       </div>
