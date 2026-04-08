@@ -5,6 +5,7 @@ import itemRouter from "./routes/itemRoutes.js";
 import customerRouter from "./routes/customerRoutes.js";
 import vendorRouter from "./routes/vendorRoutes.js";
 import defaultsRouter from "./routes/defaultsRoutes.js";
+import syncRouter from "./routes/syncRoutes.js";
 import { startSidequest } from "./sidequest.js";
 
 dotenv.config();
@@ -19,6 +20,7 @@ app.use("/qbo/items", itemRouter);
 app.use("/qbo/customers", customerRouter);
 app.use("/qbo/vendors", vendorRouter);
 app.use("/qbo/defaults", defaultsRouter);
+app.use("/qbo/sync", syncRouter);
 
 const bootstrap = async () => {
   await startSidequest();

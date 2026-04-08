@@ -4,6 +4,7 @@ export const mockAuthMW = (req, res, next) => {
     name: "Mock User",
     email: "mockuser@example.com",
     tenantId: 2,
+    branchId: 1,
     };
     next();
 };

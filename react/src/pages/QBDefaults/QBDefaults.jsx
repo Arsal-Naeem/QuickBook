@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LuPencil } from "react-icons/lu";
+import { LuCheck, LuPencil } from "react-icons/lu";
 import { Link } from "react-router-dom";
 
 const QBO_SEARCH_SETTINGS = [
@@ -87,6 +87,9 @@ export default function QBDefaults() {
   const [isSaving, setIsSaving] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [pageError, setPageError] = useState("");
+  const [syncMessage, setSyncMessage] = useState("");
+  const [isSyncingCustomers, setIsSyncingCustomers] = useState(false);
+  const [isSyncingVendors, setIsSyncingVendors] = useState(false);
 
   const activeSetting = useMemo(
     () =>
@@ -233,6 +236,57 @@ export default function QBDefaults() {
       setIsSaving(false);
     }
   };
+
+  const handleSyncCustomers = async () => {
+    setIsSyncingCustomers(true);
+    setSyncMessage("");
+
+    try {
+      const response = await fetch("/api/qbo/sync/customers", {
+        method: "POST",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Failed to submit customer sync request.",
+        );
+      }
+
+      setSyncMessage(data.message || "Sync submitted.");
+    } catch (error) {
+      setSyncMessage(
+        error.message || "Failed to submit customer sync request.",
+      );
+    } finally {
+      setIsSyncingCustomers(false);
+    }
+  };
+
+  const handleSyncVendors = async () => {
+    setIsSyncingVendors(true);
+    setSyncMessage("");
+
+    try {
+      const response = await fetch("/api/qbo/sync/vendors", {
+        method: "POST",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to submit vendor sync request.");
+      }
+
+      setSyncMessage(data.message || "Sync submitted.");
+    } catch (error) {
+      setSyncMessage(error.message || "Failed to submit vendor sync request.");
+    } finally {
+      setIsSyncingVendors(false);
+    }
+  };
+
+  const isCustomersSynced = savedDefaults["customers_synced"]?.QB_ID === "1";
+  const isVendorsSynced = savedDefaults["vendors_synced"]?.QB_ID === "1";
 
   return (
     <main className="bg-atmosphere min-h-screen p-8 text-slate-100">
@@ -413,6 +467,68 @@ export default function QBDefaults() {
               );
             })
           )}
+        </section>
+        <section className="space-y-4">
+          {syncMessage ? (
+            <div className="flex items-center justify-between rounded-xl border border-sky-300/40 bg-sky-400/10 px-4 py-3 text-sm text-sky-100">
+              <span>{syncMessage}</span>
+              <button
+                type="button"
+                onClick={() => setSyncMessage("")}
+                className="ml-4 text-sky-300 hover:text-white transition text-xs"
+              >
+                Dismiss
+              </button>
+            </div>
+          ) : null}
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-card/80 px-4 py-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-200">
+                  Customers
+                </p>
+                {isCustomersSynced ? (
+                  <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-emerald-400">
+                    <LuCheck className="h-3 w-3" />
+                    Synced
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-400 mt-0.5">Not synced</p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={handleSyncCustomers}
+                disabled={isSyncingCustomers}
+                className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSyncingCustomers ? "Syncing..." : "Sync Customers"}
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-card/80 px-4 py-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-200">Vendors</p>
+                {isVendorsSynced ? (
+                  <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-emerald-400">
+                    <LuCheck className="h-3 w-3" />
+                    Synced
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-400 mt-0.5">Not synced</p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={handleSyncVendors}
+                disabled={isSyncingVendors}
+                className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSyncingVendors ? "Syncing..." : "Sync Vendors"}
+              </button>
+            </div>
+          </div>
         </section>
       </div>
     </main>

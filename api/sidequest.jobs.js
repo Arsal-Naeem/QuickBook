@@ -1,8 +1,4 @@
-/**
- * Register Sidequest job classes here.
- *
- * Example:
- * import { ExampleJob } from "./jobs/ExampleJob.js";
- * export { ExampleJob };
- */
-export {};
+import { SyncQboCustomersJob } from "./jobs/SyncQboCustomersJob.js";
+import { SyncQboVendorsJob } from "./jobs/SyncQboVendorsJob.js";
+
+export { SyncQboCustomersJob, SyncQboVendorsJob };
