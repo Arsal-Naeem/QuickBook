@@ -31,11 +31,15 @@ export default function QboTestDashboard() {
     <div className="bg-atmosphere min-h-screen text-slate-100 p-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold">QuickBooks API Tests</h1>
-            <div className="flex items-center gap-4">
-              <Link to="/qb-defaults" className="text-accent underline">QB Defaults</Link>
-              <Link to="/" className="text-accent underline">Back to Home</Link>
-            </div>
+          <h1 className="text-3xl font-bold">QuickBooks API Tests</h1>
+          <div className="flex items-center gap-4">
+            <Link to="/qb-defaults" className="text-accent underline">
+              QB Defaults
+            </Link>
+            <Link to="/" className="text-accent underline">
+              Back to Home
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -45,24 +49,32 @@ export default function QboTestDashboard() {
             <div className="flex flex-col space-y-3">
               <button
                 disabled={isLoading}
-                onClick={() => fetchApi("/api/qbo/items/createItem", "POST", {
-                  Name: "Sample Item 2",
-                  Type: "NonInventory",
-                  IncomeAccountRef: { value: "1", name: "Services" }
-                })}
+                onClick={() =>
+                  fetchApi("/api/qbo/items/createItem", "POST", {
+                    name: "Sample Item 48",
+                    type: "Inventory",
+                    sku: "ITM-020",
+                    description: "A fresh sample product",
+                    price: 99.99,
+                    qtyOnHand: 50,
+                  })
+                }
                 className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition"
               >
                 Create
               </button>
               <button
                 disabled={isLoading}
-                onClick={() => fetchApi("/api/qbo/items/updateItem", "POST", {
-                  Id: "1",
-                  SyncToken: "0",
-                  Name: "Updated Item Name",
-                  Type: "NonInventory",
-                  IncomeAccountRef: { value: "1", name: "Services" }
-                })}
+                onClick={() =>
+                  fetchApi("/api/qbo/items/updateItem", "POST", {
+                    qbItemId: "1", // Triggers the Update logic on the backend
+                    name: "Updated Item Name",
+                    type: "Service",
+                    sku: "ITM-002-UPDATED",
+                    description: "Updated product description",
+                    price: 120.0,
+                  })
+                }
                 className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition"
               >
                 Update
@@ -83,33 +95,40 @@ export default function QboTestDashboard() {
             <div className="flex flex-col space-y-3">
               <button
                 disabled={isLoading}
-                onClick={() => fetchApi("/api/qbo/customers/createCustomer", "POST", {
-                  DisplayName: "Sample Customer",
-                  PrimaryPhone: { FreeFormNumber: "555-555-5555" },
-                  PrimaryEmailAddr: { Address: "sample.customer@example.com" },
-                  BillAddr: { Line1: "123 Main Street", City: "Mountain View", CountrySubDivisionCode: "CA", PostalCode: "94043", Country: "US" }
-                })}
+                onClick={() =>
+                  fetchApi("/api/qbo/customers/pushCustomer", "POST", {
+                    name: "Sample Customer",
+                    phone: "555-555-5555",
+                    email: "sample.customer@example.com",
+                    address: "123 Main Street, Mountain View, CA 94043",
+                    type: "Customer",
+                  })
+                }
                 className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition"
               >
                 Create
               </button>
               <button
                 disabled={isLoading}
-                onClick={() => fetchApi("/api/qbo/customers/updateCustomer", "POST", {
-                  Id: "1",
-                  SyncToken: "0",
-                  DisplayName: "Updated Customer Name",
-                  PrimaryPhone: { FreeFormNumber: "555-000-0000" },
-                  PrimaryEmailAddr: { Address: "updated.customer@example.com" },
-                  BillAddr: { Line1: "456 New Street", City: "Sunnyvale", CountrySubDivisionCode: "CA", PostalCode: "94086", Country: "US" }
-                })}
+                onClick={() =>
+                  fetchApi("/api/qbo/customers/pushCustomer", "POST", {
+                    qbEntityId: "1", // Triggers the Update logic on the backend
+                    name: "Updated Customer Name",
+                    phone: "555-000-0000",
+                    email: "updated.customer@example.com",
+                    address: "456 New Street, Sunnyvale, CA 94086",
+                    type: "Customer",
+                  })
+                }
                 className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition"
               >
                 Update
               </button>
               <button
                 disabled={isLoading}
-                onClick={() => fetchApi("/api/qbo/customers/getAllCustomers", "GET")}
+                onClick={() =>
+                  fetchApi("/api/qbo/customers/getAllCustomers", "GET")
+                }
                 className="bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-600 transition"
               >
                 Get All
@@ -123,35 +142,40 @@ export default function QboTestDashboard() {
             <div className="flex flex-col space-y-3">
               <button
                 disabled={isLoading}
-                onClick={() => fetchApi("/api/qbo/vendors/createVendor", "POST", {
-                  DisplayName: "Sample Vendor",
-                  PrimaryPhone: { FreeFormNumber: "555-111-2222" },
-                  PrimaryEmailAddr: { Address: "sample.vendor@example.com" },
-                  BillAddr: { Line1: "789 Vendor Lane", City: "San Jose", CountrySubDivisionCode: "CA", PostalCode: "95101", Country: "US" },
-                  Vendor1099: false
-                })}
+                onClick={() =>
+                  fetchApi("/api/qbo/vendors/pushVendor", "POST", {
+                    name: "Sample Vendor",
+                    phone: "555-111-2222",
+                    email: "sample.vendor@example.com",
+                    address: "789 Vendor Lane, San Jose, CA 95101",
+                    type: "Vendor",
+                  })
+                }
                 className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition"
               >
                 Create
               </button>
               <button
                 disabled={isLoading}
-                onClick={() => fetchApi("/api/qbo/vendors/updateVendor", "POST", {
-                  Id: "1",
-                  SyncToken: "0",
-                  DisplayName: "Updated Vendor Name",
-                  PrimaryPhone: { FreeFormNumber: "555-999-8888" },
-                  PrimaryEmailAddr: { Address: "updated.vendor@example.com" },
-                  BillAddr: { Line1: "321 Updated Blvd", City: "Fremont", CountrySubDivisionCode: "CA", PostalCode: "94536", Country: "US" },
-                  Vendor1099: true
-                })}
+                onClick={() =>
+                  fetchApi("/api/qbo/vendors/pushVendor", "POST", {
+                    qbEntityId: "1", // Triggers the Update logic on the backend
+                    name: "Updated Vendor Name",
+                    phone: "555-999-8888",
+                    email: "updated.vendor@example.com",
+                    address: "321 Updated Blvd, Fremont, CA 94536",
+                    type: "Vendor",
+                  })
+                }
                 className="bg-accent text-ink px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition"
               >
                 Update
               </button>
               <button
                 disabled={isLoading}
-                onClick={() => fetchApi("/api/qbo/vendors/getAllVendors", "GET")}
+                onClick={() =>
+                  fetchApi("/api/qbo/vendors/getAllVendors", "GET")
+                }
                 className="bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-600 transition"
               >
                 Get All

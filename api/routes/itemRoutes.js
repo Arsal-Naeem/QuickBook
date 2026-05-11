@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import OAuthClient from "intuit-oauth";
 import dotenv from "dotenv";
 import pool from "../database/pool.js";
-import { getValidQboClient, handleQboRouteError } from "../utils/qboHelpers.js";
+import { getValidQboClient, handleQboRouteError, pushProductToQB } from "../utils/qboHelpers.js";
 import mockAuthMW from "../middlewares/mockAuthMW.js";
 
 dotenv.config();
@@ -20,24 +20,14 @@ router.post("/createItem", mockAuthMW, async (req, res) => {
   let con;
   try {
     con = await pool.getConnection();
-    const { oauthClient, Realm_ID } = await getValidQboClient(con, req.user.tenantId);
-
-    const payload = req.body;
-
-    const url = `${apiBaseUrl}v3/company/${Realm_ID}/item`;
-    const apiResponse = await oauthClient.makeApiCall({
-      url,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+    
+    const result = await pushProductToQB({
+      con,
+      tenantId: req.user.tenantId,
+      ...req.body
     });
 
-    const data =
-      typeof apiResponse.json === "string"
-        ? JSON.parse(apiResponse.json)
-        : apiResponse.json;
-
-    return res.status(201).json(data);
+    return res.status(201).json(result);
   } catch (error) {
     return handleQboRouteError(error, res);
   } finally {
@@ -50,25 +40,15 @@ router.post("/updateItem", mockAuthMW, async (req, res) => {
   let con;
   try {
     con = await pool.getConnection();
-    const { oauthClient, Realm_ID } = await getValidQboClient(con, req.user.tenantId);
-
-    // Id and SyncToken are required by QBO for updates
-    const payload = req.body;
-
-    const url = `${apiBaseUrl}v3/company/${Realm_ID}/item`;
-    const apiResponse = await oauthClient.makeApiCall({
-      url,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+    
+    // The req.body must contain 'qbItemId' to trigger the update flow
+    const result = await pushProductToQB({
+      con,
+      tenantId: req.user.tenantId,
+      ...req.body
     });
 
-    const data =
-      typeof apiResponse.json === "string"
-        ? JSON.parse(apiResponse.json)
-        : apiResponse.json;
-
-    return res.json(data);
+    return res.json(result);
   } catch (error) {
     return handleQboRouteError(error, res);
   } finally {

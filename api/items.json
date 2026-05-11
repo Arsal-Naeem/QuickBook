@@ -11,7 +11,7 @@
         "Type": "Service",
         "IncomeAccountRef": {
           "value": "48",
-          "name": "Fountains and Garden Lighting"
+          "name": "Landscaping Services:Job Materials:Fountains and Garden Lighting"
         },
         "PurchaseCost": 0,
         "TrackQtyOnHand": false,
@@ -102,7 +102,7 @@
         "Type": "Service",
         "IncomeAccountRef": {
           "value": "52",
-          "name": "Installation"
+          "name": "Landscaping Services:Labor:Installation"
         },
         "PurchaseCost": 0,
         "TrackQtyOnHand": false,
@@ -125,7 +125,7 @@
         "Type": "Service",
         "IncomeAccountRef": {
           "value": "48",
-          "name": "Fountains and Garden Lighting"
+          "name": "Landscaping Services:Job Materials:Fountains and Garden Lighting"
         },
         "PurchaseCost": 0,
         "TrackQtyOnHand": false,
@@ -148,7 +148,7 @@
         "Type": "Service",
         "IncomeAccountRef": {
           "value": "53",
-          "name": "Maintenance and Repair"
+          "name": "Landscaping Services:Labor:Maintenance and Repair"
         },
         "PurchaseCost": 0,
         "TrackQtyOnHand": false,
@@ -285,7 +285,7 @@
         "Type": "Service",
         "IncomeAccountRef": {
           "value": "48",
-          "name": "Fountains and Garden Lighting"
+          "name": "Landscaping Services:Job Materials:Fountains and Garden Lighting"
         },
         "PurchaseCost": 0,
         "TrackQtyOnHand": false,
@@ -343,6 +343,40 @@
         }
       },
       {
+        "Name": "Sample Item 48",
+        "Sku": "ITM-020",
+        "Description": "A fresh sample product",
+        "Active": true,
+        "FullyQualifiedName": "Sample Item 48",
+        "Taxable": false,
+        "UnitPrice": 99.99,
+        "Type": "Inventory",
+        "IncomeAccountRef": {
+          "value": "79",
+          "name": "Sales of Product Income"
+        },
+        "PurchaseCost": 0,
+        "ExpenseAccountRef": {
+          "value": "80",
+          "name": "Cost of Goods Sold"
+        },
+        "AssetAccountRef": {
+          "value": "81",
+          "name": "Inventory Asset"
+        },
+        "TrackQtyOnHand": true,
+        "QtyOnHand": 50,
+        "InvStartDate": "2026-05-11",
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "21",
+        "SyncToken": "0",
+        "MetaData": {
+          "CreateTime": "2026-05-10T22:57:13-07:00",
+          "LastUpdatedTime": "2026-05-10T22:57:13-07:00"
+        }
+      },
+      {
         "Name": "Services",
         "Active": true,
         "FullyQualifiedName": "Services",
@@ -374,7 +408,7 @@
         "Type": "Service",
         "IncomeAccountRef": {
           "value": "49",
-          "name": "Plants and Soil"
+          "name": "Landscaping Services:Job Materials:Plants and Soil"
         },
         "PurchaseCost": 0,
         "TrackQtyOnHand": false,
@@ -397,13 +431,13 @@
         "Type": "Service",
         "IncomeAccountRef": {
           "value": "49",
-          "name": "Plants and Soil"
+          "name": "Landscaping Services:Job Materials:Plants and Soil"
         },
         "PurchaseDesc": "2 cubic ft. bag",
         "PurchaseCost": 6.5,
         "ExpenseAccountRef": {
           "value": "66",
-          "name": "Plants and Soil"
+          "name": "Job Expenses:Job Materials:Plants and Soil"
         },
         "TrackQtyOnHand": false,
         "domain": "QBO",
@@ -508,7 +542,7 @@
       }
     ],
     "startPosition": 1,
-    "maxResults": 20
+    "maxResults": 21
   },
-  "time": "2026-03-31T04:44:58.419-07:00"
+  "time": "2026-05-10T23:01:00.323-07:00"
 }
