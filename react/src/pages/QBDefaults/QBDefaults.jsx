@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { LuCheck, LuPencil } from "react-icons/lu";
 import { Link } from "react-router-dom";
+import QBOConnectionStatus from "./QBOConnectionStatus";
 
 const QBO_Fields = [
   {
@@ -351,6 +352,8 @@ export default function QBDefaults() {
             </Link>
           </div>
         </header>
+
+        <QBOConnectionStatus onError={setPageError} />
 
         {pageError ? (
           <p className="rounded-xl border border-rose-300/40 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">

@@ -76,7 +76,7 @@ router.get("/callback", async (req, res) => {
     await upsertToken(con, token, Realm_ID, tenantId);
 
     return res.redirect(
-      process.env.QBO_FRONTEND_URL || "http://localhost:5173",
+      process.env.QBO_FRONTEND_URL || "http://localhost:5173/qb-defaults",
     );
   } catch (error) {
     console.error("QBO callback failed:", error);
@@ -84,6 +84,49 @@ router.get("/callback", async (req, res) => {
       error: "Failed to complete QuickBooks authentication.",
       details: error.originalMessage || error.message || "Unknown error",
     });
+  } finally {
+    if (con) con.release();
+  }
+});
+
+router.get("/status", mockAuthMW, async (req, res) => {
+  let con;
+  try {
+    con = await pool.getConnection();
+    
+    await getValidQboClient(con, req.user.tenantId);
+    
+    return res.json({ status: "connected" });
+  } catch (error) {
+    if (error.message === "No stored token found. Authenticate first via /authUri.") {
+      return res.json({ status: "not_connected" });
+    }
+    if (error.code === "QB_REFRESH") {
+      return res.json({ status: "needs_reconnect" });
+    }
+    console.error("Status check failed:", error);
+    return res.status(500).json({ status: "error", message: "Failed to check status" });
+  } finally {
+    if (con) con.release();
+  }
+});
+
+router.post("/refresh", mockAuthMW, async (req, res) => {
+  let con;
+  try {
+    con = await pool.getConnection();
+    await getValidQboClient(con, req.user.tenantId);
+    
+    return res.json({ success: true, status: "connected" });
+  } catch (error) {
+    if (
+      error.message === "No stored token found. Authenticate first via /authUri." || 
+      error.code === "QB_REFRESH"
+    ) {
+      return res.json({ success: false, status: "needs_reconnect" });
+    }
+    console.error("Refresh failed:", error);
+    return res.status(500).json({ success: false, message: "Internal server error during refresh" });
   } finally {
     if (con) con.release();
   }
