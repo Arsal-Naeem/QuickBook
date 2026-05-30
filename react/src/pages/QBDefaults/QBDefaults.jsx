@@ -53,6 +53,12 @@ const QBO_Fields = [
     searchEndpoint: "/api/qbo/defaults/searchPaymentMethods",
   },
   {
+    type: "search",
+    key: "delivery_fee",
+    label: "Delivery Fee",
+    searchEndpoint: "/api/qbo/defaults/searchServiceItems",
+  },
+  {
     type: "button",
     key: "sync_customers",
     label: "Customers",

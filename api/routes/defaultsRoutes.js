@@ -212,4 +212,36 @@ router.get("/searchPaymentMethods", mockAuthMW, async (req, res) => {
   }
 });
 
+router.get("/searchServiceItems", mockAuthMW, async (req, res) => {
+  let con;
+  try {
+    const searchTerm = sanitizeQboSearchTerm(req.query.q);
+
+    con = await pool.getConnection();
+    const { oauthClient, Realm_ID } = await getValidQboClient(
+      con,
+      req.user.tenantId,
+    );
+
+    const query = encodeURIComponent(
+      `SELECT Id, Name, Type FROM Item WHERE Type = 'Service' AND Name LIKE '%${searchTerm}%' MAXRESULTS 50`,
+    );
+    const url = `${apiBaseUrl}v3/company/${Realm_ID}/query?query=${query}`;
+    const apiResponse = await oauthClient.makeApiCall({ url });
+    const data = parseQboApiResponse(apiResponse);
+
+    const normalizedItems = (data?.QueryResponse?.Item ?? []).map((item) => ({
+      id: item?.Id ?? null,
+      name: item?.Name ?? "",
+      accountType: item?.Type ?? "",
+    }));
+
+    return res.json(normalizedItems);
+  } catch (error) {
+    return handleQboRouteError(error, res);
+  } finally {
+    if (con) con.release();
+  }
+});
+
 export default router;
