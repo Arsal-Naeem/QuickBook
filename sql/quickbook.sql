@@ -47,6 +47,7 @@ CREATE TABLE
         Email VARCHAR(250) NULL,
         Phone VARCHAR(50) NULL,
         Note TEXT NULL,
+        Type VARCHAR(100) NULL,
         QB_ID VARCHAR(100) NULL,
         Tenant_ID int NOT NULL DEFAULT 1,
         Is_Intrinsic boolean DEFAULT 0,
@@ -324,6 +325,7 @@ CREATE TABLE
     skus (
         ID int AUTO_INCREMENT NOT NULL,
         Menu_Item_ID int,
+        QB_ID VARCHAR(100) NULL,
         Tenant_ID int NOT NULL,
         SKU varchar(50) NOT NULL,
         Ratio float NOT NULL DEFAULT 1,
