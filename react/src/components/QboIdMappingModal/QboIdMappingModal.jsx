@@ -133,22 +133,22 @@ export default function QboIdMappingModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-slate-800 border border-slate-600 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
-        <div className="flex items-center justify-between border-b border-slate-700 px-6 py-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div>
-            <h2 className="text-lg font-bold text-slate-100">
+            <h2 className="text-lg font-bold text-slate-900">
               Map QuickBooks Entity
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Mapping{" "}
-              <span className="font-semibold text-accent">{entityName}</span>{" "}
+              <span className="font-semibold text-[#2CA01C]">{entityName}</span>{" "}
               (Internal ID: {entityId})
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="text-slate-400 hover:text-white transition rounded-full p-1 hover:bg-slate-700"
+            className="text-slate-400 hover:text-slate-600 transition rounded-full p-1 hover:bg-slate-100"
           >
             <LuX className="h-5 w-5" />
           </button>
@@ -156,7 +156,7 @@ export default function QboIdMappingModal({
 
         <div className="p-6 flex-1 overflow-y-auto">
           {error && (
-            <div className="mb-4 rounded-xl border border-rose-300/40 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">
+            <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
               {error}
             </div>
           )}
@@ -171,22 +171,22 @@ export default function QboIdMappingModal({
                 setSelectedResult(null);
               }}
               placeholder={`Search ${type}s in QuickBooks...`}
-              className="w-full bg-slate-900 border border-slate-600 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2CA01C]"
               autoFocus
             />
           </div>
 
-          <div className="h-64 overflow-y-auto rounded-xl border border-slate-700 bg-slate-900/50">
+          <div className="h-64 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50">
             {searchTerm.trim().length < 2 ? (
-              <p className="p-4 text-sm text-slate-400 text-center mt-4">
+              <p className="p-4 text-sm text-slate-500 text-center mt-4">
                 Type at least 2 characters to search QBO.
               </p>
             ) : isSearching ? (
-              <p className="p-4 text-sm text-slate-400 text-center mt-4">
+              <p className="p-4 text-sm text-slate-500 text-center mt-4">
                 Searching...
               </p>
             ) : searchResults.length === 0 ? (
-              <p className="p-4 text-sm text-slate-400 text-center mt-4">
+              <p className="p-4 text-sm text-slate-500 text-center mt-4">
                 No results found.
               </p>
             ) : (
@@ -199,10 +199,10 @@ export default function QboIdMappingModal({
                   <button
                     key={result.id}
                     onClick={() => setSelectedResult(result)}
-                    className={`w-full text-left px-4 py-3 border-b border-slate-700/50 last:border-0 transition ${
+                    className={`w-full text-left px-4 py-3 border-b border-slate-200 last:border-0 transition ${
                       isSelected
-                        ? "bg-accent/20 text-accent"
-                        : "hover:bg-slate-700 text-slate-200"
+                        ? "bg-[#2CA01C]/10 text-[#2CA01C]"
+                        : "hover:bg-slate-100 text-slate-700"
                     }`}
                   >
                     <p className="font-medium text-sm">{label}</p>
@@ -219,17 +219,17 @@ export default function QboIdMappingModal({
           </div>
         </div>
 
-        <div className="border-t border-slate-700 px-6 py-4 flex items-center justify-end gap-3 bg-slate-800/50">
+        <div className="border-t border-slate-200 px-6 py-4 flex items-center justify-end gap-3 bg-slate-50">
           <button
             onClick={handleClose}
-            className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-700 transition"
+            className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={!selectedResult || isSaving}
-            className="bg-accent text-ink px-5 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-[#2CA01C] text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-[#238016] transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             {isSaving ? "Saving..." : "Map & Save"}
           </button>
