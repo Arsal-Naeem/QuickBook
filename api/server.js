@@ -5,6 +5,7 @@ import itemRouter from "./routes/itemRoutes.js";
 import customerRouter from "./routes/customerRoutes.js";
 import vendorRouter from "./routes/vendorRoutes.js";
 import defaultsRouter from "./routes/defaultsRoutes.js";
+import qboMappingRouter from "./routes/qboMappingRoutes.js";
 import syncRouter from "./routes/syncRoutes.js";
 import { startSidequest } from "./sidequest.js";
 
@@ -21,6 +22,7 @@ app.use("/qbo/customers", customerRouter);
 app.use("/qbo/vendors", vendorRouter);
 app.use("/qbo/defaults", defaultsRouter);
 app.use("/qbo/sync", syncRouter);
+app.use("/qbo/mapping", qboMappingRouter);
 
 const bootstrap = async () => {
   await startSidequest();

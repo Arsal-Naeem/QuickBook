@@ -286,3 +286,92 @@ BEGIN
 END //
 
 DELIMITER ;
+
+DROP TABLE IF EXISTS `menu_categories`;
+
+CREATE TABLE
+    `menu_categories` (
+        `ID` int NOT NULL AUTO_INCREMENT,
+        `Name` varchar(500) DEFAULT NULL,
+        `Is_Deal` boolean DEFAULT 0,
+        `Tenant_ID` int NOT NULL DEFAULT 1,
+        INDEX Tenant_IDX (Tenant_ID),
+        PRIMARY KEY (ID, Tenant_ID)
+    )
+PARTITION BY
+    KEY (Tenant_ID) PARTITIONS 1;
+
+DROP TABLE IF EXISTS `menu_items`;
+
+CREATE TABLE
+    `menu_items` (
+        `ID` int NOT NULL AUTO_INCREMENT,
+        `Name` varchar(500) DEFAULT NULL,
+        `QB_ID` varchar(100) DEFAULT NULL,
+        `Price` float DEFAULT NULL,
+        `Category` int DEFAULT NULL,
+        `Image_URL` LONGTEXT DEFAULT NULL,
+        `Tenant_ID` int NOT NULL DEFAULT 1,
+        INDEX Tenant_IDX (Tenant_ID),
+        PRIMARY KEY (ID, Tenant_ID)
+    )
+PARTITION BY
+    HASH (Tenant_ID) PARTITIONS 1;
+
+DROP TABLE IF EXISTS skus;
+
+CREATE TABLE
+    skus (
+        ID int AUTO_INCREMENT NOT NULL,
+        Menu_Item_ID int,
+        Tenant_ID int NOT NULL,
+        SKU varchar(50) NOT NULL,
+        Ratio float NOT NULL DEFAULT 1,
+        Alert_Threshold float NOT NULL DEFAULT 5,
+        INDEX Tenant_IDX (Tenant_ID),
+        PRIMARY KEY (ID, Tenant_ID),
+        UNIQUE (SKU, Tenant_ID)
+    )
+PARTITION BY
+    HASH (Tenant_ID) PARTITIONS 1;
+
+-- Dummy Data
+
+INSERT INTO menu_categories (ID, Name, Is_Deal, Tenant_ID)
+VALUES
+  (101, 'Beverages', 0, 1),
+  (102, 'Snacks', 0, 1),
+  (103, 'Main Course', 0, 1)
+ON DUPLICATE KEY UPDATE
+  Name = VALUES(Name),
+  Is_Deal = VALUES(Is_Deal);
+
+INSERT INTO menu_items (ID, Name, Price, Category, Image_URL, Tenant_ID)
+VALUES
+  (1001, 'Cold Brew Coffee', 4.99, 101, 'https://images.unsplash.com/photo-1686794154262-c8aa45e85848', 1),
+  (1002, 'Iced Matcha Latte', 5.49, 101, 'https://images.unsplash.com/photo-1686794154608-e45c831ef567', 1),
+  (1003, 'Sea Salt Chips', 2.99, 102, 'https://images.unsplash.com/photo-1738986586823-bba0e1c11372', 1),
+  (1004, 'Grilled Chicken Bowl', 10.99, 103, 'https://images.unsplash.com/photo-1666599028424-e316d4e34aa6', 1),
+  (1005, 'Paneer Tikka Wrap', 9.49, 103, 'https://images.unsplash.com/photo-1666493243529-b3b81e7e0a1b', 1)
+ON DUPLICATE KEY UPDATE
+  Name = VALUES(Name),
+  Price = VALUES(Price),
+  Category = VALUES(Category),
+  Image_URL = VALUES(Image_URL);
+
+INSERT INTO skus (Menu_Item_ID, Tenant_ID, SKU, Ratio, Alert_Threshold)
+VALUES
+  (1001, 1, 'BEV-COLD-001', 1, 5),
+  (1001, 1, 'BEV-COLD-002', 1, 5),
+  (1002, 1, 'BEV-MATCHA-001', 1, 5),
+  (1002, 1, 'BEV-MATCHA-002', 1, 5),
+  (1003, 1, 'SNK-CHIPS-001', 1, 5),
+  (1003, 1, 'SNK-CHIPS-002', 1, 5),
+  (1004, 1, 'MAIN-CHK-001', 1, 5),
+  (1004, 1, 'MAIN-CHK-002', 1, 5),
+  (1005, 1, 'MAIN-PAN-001', 1, 5),
+  (1005, 1, 'MAIN-PAN-002', 1, 5)
+ON DUPLICATE KEY UPDATE
+  Menu_Item_ID = VALUES(Menu_Item_ID),
+  Ratio = VALUES(Ratio),
+  Alert_Threshold = VALUES(Alert_Threshold);

@@ -4,6 +4,7 @@ import QboTestDashboard from "./pages/QBOTestDashboard/QboTestDashboard.jsx";
 import QBDefaults from "./pages/QBDefaults/QBDefaults.jsx";
 import "./index.css";
 import Home from "./pages/Home/App.jsx";
+import MappingTestWrapper from "./pages/MappingTestWrapper/MappingTestWrapper.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -11,6 +12,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/" element={<Home />} />
       <Route path="/test" element={<QboTestDashboard />} />
       <Route path="/qb-defaults" element={<QBDefaults />} />
+      <Route path="/mapping-test" element={<MappingTestWrapper />} />
     </Routes>
   </BrowserRouter>,
 );
